@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TERMINAL // NEXUS TRADER v2.4</title>
+    <title>Pro Trader Terminal</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;700&display=swap');
 
@@ -32,7 +32,7 @@
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            box-shadow: 0 0 25px rgba(6, 182, 212, 0.1);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
             padding: 15px;
         }
 
@@ -85,7 +85,6 @@
             background: rgba(6, 182, 212, 0.1);
             color: var(--accent-cyan);
             border-color: var(--accent-cyan);
-            box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
         }
 
         .section-box {
@@ -108,7 +107,7 @@
             background: #090d19;
             color: var(--text-dim);
             border: 1px solid var(--border-color);
-            padding: 5px 10px;
+            padding: 6px 12px;
             font-family: 'Share Tech Mono', monospace;
             font-size: 11px;
             cursor: pointer;
@@ -121,27 +120,22 @@
             font-weight: bold;
         }
 
-        /* Chart Canvas Styling */
-        .chart-wrapper {
-            position: relative;
-            height: 140px;
-            background: #010409;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            margin-bottom: 10px;
-            overflow: hidden;
-        }
-        canvas {
+        /* TradingView Widget Container */
+        .tv-chart-container {
+            height: 300px;
             width: 100%;
-            height: 100%;
-            display: block;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
         }
 
-        .price-display {
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 22px;
-            font-weight: bold;
+        .trade-controls {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 8px;
             margin-bottom: 8px;
+            align-items: center;
         }
 
         .trade-buttons {
@@ -163,6 +157,18 @@
         .btn-buy:hover { background: var(--accent-green); color: #000; }
         .btn-sell { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); border: 1px solid var(--accent-red); }
         .btn-sell:hover { background: var(--accent-red); color: #fff; }
+
+        select, input {
+            background: #090d19;
+            color: white;
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 4px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 13px;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
         .terminal-log {
             background: #010409;
@@ -204,7 +210,7 @@
     <div class="terminal-container">
         <!-- HEADER KEUANGAN -->
         <div class="header-bar">
-            <div class="logo">⚡ NEXUS_TERMINAL // v2.4</div>
+            <div class="logo">📈 PRO TRADER TERMINAL</div>
             <div class="wallet-display">
                 USD: <span id="val-usd" style="color: var(--accent-cyan);">$1,500.00</span> | 
                 BTC: <span id="val-crypto" style="color: #fbbf24;">0.0000</span>
@@ -213,30 +219,40 @@
 
         <!-- NAV TAB -->
         <div class="nav-grid">
-            <button class="tab-btn active" onclick="switchTab('trading', this)">[01] TRADING_FX</button>
-            <button class="tab-btn" onclick="switchTab('mining', this)">[02] CRYPTO_RIG</button>
+            <button class="tab-btn active" onclick="switchTab('trading', this)">[01] FOREX & CRYPTO</button>
+            <button class="tab-btn" onclick="switchTab('mining', this)">[02] CRYPTO RIG</button>
             <button class="tab-btn" onclick="switchTab('upgrade', this)">[03] HARDWARE</button>
         </div>
 
-        <!-- TAB 1: TRADING MARKET & CHART -->
+        <!-- TAB 1: TRADING MARKET & TRADINGVIEW CHART -->
         <div id="tab-trading" class="tab-content">
             <div class="section-box">
-                <!-- PILIH PAIR -->
-                <div class="pair-selector" id="pair-list">
-                    <!-- Pair akan diisi otomatis via JS -->
+                <!-- PILIH PAIR TRADING -->
+                <div class="pair-selector">
+                    <button class="pair-btn active" onclick="changePair('FX_IDC:XAUUSD', 'XAU/USD', this)">XAU/USD</button>
+                    <button class="pair-btn" onclick="changePair('FX:EURUSD', 'EUR/USD', this)">EUR/USD</button>
+                    <button class="pair-btn" onclick="changePair('FX:GBPUSD', 'GBP/USD', this)">GBP/USD</button>
+                    <button class="pair-btn" onclick="changePair('FX:USDJPY', 'USD/JPY', this)">USD/JPY</button>
+                    <button class="pair-btn" onclick="changePair('BINANCE:BTCUSDT', 'BTC/USD', this)">BTC/USD</button>
+                    <button class="pair-btn" onclick="changePair('BINANCE:ETHUSDT', 'ETH/USD', this)">ETH/USD</button>
                 </div>
 
-                <!-- LIVE PRICE & CHART -->
-                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                <!-- WIDGET TRADINGVIEW ASLI (REALTIME) -->
+                <div class="tv-chart-container" id="tradingview_widget"></div>
+
+                <!-- INPUT LOT & TOMBOL EKSEKUSI -->
+                <div class="trade-controls">
                     <div>
-                        <div style="font-size: 11px; color: var(--text-dim);" id="active-pair-label">XAU/USD (GOLD)</div>
-                        <div class="price-display" id="active-price">$2,650.00</div>
+                        <label style="font-size: 11px; color: var(--text-dim); display:block; margin-bottom:2px;">LOT SIZE:</label>
+                        <select id="lot-size">
+                            <option value="0.01">0.01 Lot</option>
+                            <option value="0.05">0.05 Lot</option>
+                            <option value="0.1">0.10 Lot</option>
+                            <option value="0.5">0.50 Lot</option>
+                            <option value="1.0">1.00 Lot (Pro)</option>
+                        </select>
                     </div>
-                    <div id="price-change" style="font-family: 'Share Tech Mono'; font-size: 13px; color: var(--accent-green);">+0.00%</div>
-                </div>
-
-                <div class="chart-wrapper">
-                    <canvas id="priceChart"></canvas>
+                    <div style="font-size: 11px; color: var(--text-dim); text-align: right;" id="pair-info-label">Pair: XAU/USD</div>
                 </div>
 
                 <div class="trade-buttons">
@@ -280,7 +296,7 @@
                     <button class="btn-tech" onclick="beliUpgrade('vga', 400)">$400</button>
                 </div>
                 <div class="upgrade-item">
-                    <div><strong>Quantum Terminal Display</strong><br><span style="font-size: 10px; color: var(--text-dim);">Akurasi analisis market forex + stabil</span></div>
+                    <div><strong>Quantum Terminal Display</strong><br><span style="font-size: 10px; color: var(--text-dim);">Stabilitas workstation trading</span></div>
                     <button class="btn-tech" onclick="beliUpgrade('terminal', 900)">$900</button>
                 </div>
             </div>
@@ -289,122 +305,79 @@
         <!-- TERMINAL LOG -->
         <div class="section-box" style="margin-bottom: 0;">
             <div style="font-size: 10px; font-family: 'Share Tech Mono'; color: var(--text-dim); margin-bottom: 4px;">SYSTEM_LOGS //</div>
-            <div class="terminal-log" id="system-log">> Sistem inisialisasi berhasil... Siap beroperasi.<br></div>
+            <div class="terminal-log" id="system-log">> Terminal siap. Hubungkan chart dan mulai trading.<br></div>
         </div>
     </div>
 
+    <!-- SCRIPT WIDGET TRADINGVIEW -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        // Data Pair Forex & Crypto Lengkap
-        const pairs = {
-            "XAU/USD": { price: 2650.00, decimals: 2, vol: 3.5 },
-            "EUR/USD": { price: 1.0850, decimals: 4, vol: 0.0015 },
-            "GBP/USD": { price: 1.3020, decimals: 4, vol: 0.0018 },
-            "USD/JPY": { price: 152.50, decimals: 2, vol: 0.15 },
-            "BTC/USD": { price: 87500.0, decimals: 1, vol: 120.0 },
-            "ETH/USD": { price: 3250.00, decimals: 2, vol: 15.0 }
-        };
+        let tvWidget = null;
+        let currentSymbol = "FX_IDC:XAUUSD";
+        let currentPairName = "XAU/USD";
 
-        let currentPair = "XAU/USD";
         let game = {
             usd: 1500.00,
             crypto: 0.0000,
-            position: null, // { pair, type, entry, amount }
+            position: null,
             miningSpeed: 0.0001
         };
 
-        // Riwayat harga untuk chart
-        let priceHistory = [];
-        for(let i=0; i<30; i++) priceHistory.push(pairs[currentPair].price);
-
-        // Inisialisasi Tombol Pair
-        function initPairs() {
-            let list = document.getElementById("pair-list");
-            list.innerHTML = "";
-            Object.keys(pairs).forEach(p => {
-                let btn = document.createElement("button");
-                btn.className = `pair-btn ${p === currentPair ? 'active' : ''}`;
-                btn.innerText = p;
-                btn.onclick = () => switchPair(p);
-                list.appendChild(btn);
+        // Muat Chart TradingView Real-time
+        function loadTradingView(symbol) {
+            document.getElementById("tradingview_widget").innerHTML = "";
+            tvWidget = new TradingView.widget({
+                "width": "100%",
+                "height": "100%",
+                "symbol": symbol,
+                "interval": "1",
+                "timezone": "Etc/UTC",
+                "theme": "dark",
+                "style": "1",
+                "locale": "id",
+                "toolbar_bg": "#090d19",
+                "enable_publishing": false,
+                "hide_side_toolbar": false,
+                "allow_symbol_change": false,
+                "container_id": "tradingview_widget"
             });
         }
 
-        function switchPair(p) {
+        function changePair(symbol, name, btn) {
             if(game.position) {
                 alert("Selesaikan posisi aktif pada pair saat ini terlebih dahulu!");
                 return;
             }
-            currentPair = p;
-            priceHistory = [];
-            for(let i=0; i<30; i++) priceHistory.push(pairs[currentPair].price);
-            document.getElementById("active-pair-label").innerText = currentPair;
-            initPairs();
+            currentSymbol = symbol;
+            currentPairName = name;
+            document.getElementById("pair-info-label").innerText = "Pair: " + name;
+
+            document.querySelectorAll('.pair-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            loadTradingView(symbol);
+            log(`Meralih market view ke ${name}`);
         }
-
-        // Main Loop Update Harga & Chart (Setiap 1 Detik)
-        setInterval(() => {
-            let data = pairs[currentPair];
-            let shift = (Math.random() - 0.49) * data.vol;
-            data.price += shift;
-            data.price = parseFloat(data.price.toFixed(data.decimals));
-
-            // Update riwayat chart
-            priceHistory.push(data.price);
-            if(priceHistory.length > 30) priceHistory.shift();
-
-            // Render Harga & Chart
-            document.getElementById("active-price").innerText = (currentPair.includes("USD") && !currentPair.startsWith("USD") && !currentPair.includes("BTC") && !currentPair.includes("ETH")) ? 
-                "$" + data.price.toLocaleString('en-US', {minimumFractionDigits: data.decimals}) : 
-                (currentPair.includes("/") ? data.price.toFixed(data.decimals) : "$" + data.price.toFixed(data.decimals));
-
-            drawChart();
-
-            // Hitung Floating P/L
-            if(game.position) {
-                let diff = data.price - game.position.entry;
-                let rawPl = game.position.type === 'BUY' ? diff : -diff;
-                let profit = rawPl * (currentPair.includes("JPY") ? 100 : (currentPair.includes("BTC") ? 0.1 : 50));
-                
-                let plEl = document.getElementById("pos-pl");
-                plEl.innerText = (profit >= 0 ? "+$" : "-$") + Math.abs(profit).toFixed(2);
-                plEl.style.color = profit >= 0 ? "var(--accent-green)" : "var(--accent-red)";
-            }
-        }, 1000);
 
         // Background Crypto Mining Loop
         setInterval(() => {
             game.crypto += game.miningSpeed;
             document.getElementById("val-crypto").innerText = game.crypto.toFixed(4);
             document.getElementById("mining-balance").innerText = game.crypto.toFixed(6) + " BTC";
+
+            // Simulasi Floating P/L sederhana jika ada posisi terbuka
+            if(game.position) {
+                let lot = game.position.lot;
+                // Simulasi fluktuasi profit berdasarkan lot
+                let randomFluctuation = (Math.random() - 0.49) * 12 * lot;
+                game.position.currentPl += randomFluctuation;
+                
+                let plEl = document.getElementById("pos-pl");
+                let plVal = game.position.currentPl;
+                plEl.innerText = (plVal >= 0 ? "+$" : "-$") + Math.abs(plVal).toFixed(2);
+                plEl.style.color = plVal >= 0 ? "var(--accent-green)" : "var(--accent-red)";
+            }
         }, 1000);
-
-        // Fungsi Menggambar Chart Canvas bergaya Terminal
-        function drawChart() {
-            let canvas = document.getElementById("priceChart");
-            let ctx = canvas.getContext("2d");
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            let min = Math.min(...priceHistory);
-            let max = Math.max(...priceHistory);
-            let range = max - min === 0 ? 1 : max - min;
-            let stepX = canvas.width / (priceHistory.length - 1);
-
-            // Gambar Garis Chart
-            ctx.beginPath();
-            ctx.strokeStyle = "var(--accent-cyan)";
-            ctx.lineWidth = 2;
-
-            priceHistory.forEach((val, i) => {
-                let x = i * stepX;
-                let y = canvas.height - ((val - min) / range) * (canvas.height - 20) - 10;
-                if(i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            });
-            ctx.stroke();
-        }
 
         function switchTab(tabName, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
@@ -418,24 +391,20 @@
                 alert("Tutup posisi aktif terlebih dahulu!");
                 return;
             }
-            let price = pairs[currentPair].price;
-            game.position = { pair: currentPair, type: type, entry: price };
+            let lot = parseFloat(document.getElementById("lot-size").value);
+            game.position = { pair: currentPairName, type: type, lot: lot, currentPl: 0 };
             
-            document.getElementById("pos-info").innerText = `${type} [${currentPair}] @ ${price}`;
+            document.getElementById("pos-info").innerText = `${type} [${currentPairName}] - ${lot} Lot`;
             document.getElementById("btn-close").style.display = "block";
-            log(`ORDER EXECUTED: ${type} ${currentPair} pada harga ${price}`);
+            log(`ORDER EXECUTED: ${type} ${currentPairName} (${lot} Lot)`);
         }
 
         function closePosition() {
-            let price = pairs[game.position.pair].price;
-            let diff = price - game.position.entry;
-            let rawPl = game.position.type === 'BUY' ? diff : -diff;
-            let profit = rawPl * (game.position.pair.includes("JPY") ? 100 : (game.position.pair.includes("BTC") ? 0.1 : 50));
-
-            game.usd += profit;
+            let finalPl = game.position.currentPl;
+            game.usd += finalPl;
             updateUI();
 
-            log(`POSITION CLOSED. P/L: ${profit >= 0 ? '+' : ''}$${profit.toFixed(2)}`);
+            log(`POSITION CLOSED. P/L: ${finalPl >= 0 ? '+' : ''}$${finalPl.toFixed(2)}`);
             game.position = null;
             document.getElementById("pos-info").innerText = "Tidak ada posisi terbuka";
             document.getElementById("pos-pl").innerText = "$0.00";
@@ -464,7 +433,7 @@
                     alert("Upgrade VGA berhasil! Hashrate mining melesat.");
                 } else if(type === 'terminal') {
                     game.miningSpeed *= 2;
-                    alert("Quantum Terminal terpasang! Stabilitas market meningkat.");
+                    alert("Quantum Terminal terpasang!");
                 }
                 updateUI();
                 log(`HARDWARE UPGRADE INSTALLED: ${type}`);
@@ -483,8 +452,10 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // Run Init
-        initPairs();
+        // Inisialisasi awal load chart TradingView
+        window.onload = function() {
+            loadTradingView(currentSymbol);
+        };
     </script>
 
 </body>
