@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trader & Crypto Tycoon Simulator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0b0f19;
+            color: #ffffff;
+            margin: 0;
+            padding: 15px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 10px auto;
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+        }
+        h1, h2 { color: #38bdf8; text-align: center; margin-top: 5px; }
+        .card {
+            background: #334155;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        button {
+            background-color: #22c55e;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            font-size: 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 6px;
+            font-weight: bold;
+        }
+        button:hover { background-color: #16a34a; }
+        .btn-sell { background-color: #ef4444; }
+        .btn-sell:hover { background-color: #dc2626; }
+        .btn-upgrade { background-color: #f59e0b; color: black; }
+        .btn-upgrade:hover { background-color: #d97706; }
+
+        /* Navbar Menu Tab */
+        .navbar {
+            display: flex;
+            justify-content: space-around;
+            background: #0f172a;
+            padding: 8px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        .nav-btn {
+            background: transparent;
+            color: #94a3b8;
+            border: none;
+            padding: 6px 10px;
+            font-size: 13px;
+            cursor: pointer;
+            font-weight: bold;
+            width: auto;
+            margin: 0;
+        }
+        .nav-btn.active {
+            color: #38bdf8;
+            border-bottom: 2px solid #38bdf8;
+        }
+
+        .chart-box {
+            background: #0f172a;
+            border: 1px solid #475569;
+            border-radius: 6px;
+            padding: 10px;
+            text-align: center;
+            font-family: monospace;
+            font-size: 18px;
+            color: #22c55e;
+            margin-bottom: 10px;
+        }
+        .log-box {
+            background: #0f172a;
+            padding: 8px;
+            border-radius: 6px;
+            height: 90px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            color: #38bdf8;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>💻 Trader & Miner Tycoon</h1>
+        
+        <!-- INFO PANEL KEUANGAN -->
+        <div class="card" style="padding: 10px; display: flex; justify-content: space-between; font-size: 13px;">
+            <span>Modal USD: <strong id="val-usd" style="color: #38bdf8;">$1,000.00</strong></span>
+            <span>Crypto Mined: <strong id="val-crypto" style="color: #fbbf24;">0.0000 BTC</strong></span>
+        </div>
+
+        <!-- NAVBAR TAB -->
+        <div class="navbar">
+            <button class="nav-btn active" onclick="switchTab('trading', this)">📈 Forex Trading</button>
+            <button class="nav-btn" onclick="switchTab('mining', this)">⛏️ Crypto Mining</button>
+            <button class="nav-btn" onclick="switchTab('upgrade', this)">🖥️ Toko Upgrade PC</button>
+        </div>
+
+        <!-- TAB 1: FOREX TRADING (XAU/USD) -->
+        <div id="tab-trading" class="tab-content">
+            <div class="card">
+                <h2>XAU/USD (Gold) Live Chart</h2>
+                <div class="chart-box" id="chart-price">$2,650.00</div>
+                <div class="stat-grid">
+                    <button onclick="openPosition('BUY')">🟢 BUY (Long)</button>
+                    <button class="btn-sell" onclick="openPosition('SELL')">🔴 SELL (Short)</button>
+                </div>
+            </div>
+            <div class="card">
+                <h2>Posisi Terbuka</h2>
+                <p>Status: <span id="pos-status" style="color: #94a3b8;">Tidak ada posisi aktif</span></p>
+                <p>Floating P/L: <span id="val-floating">$0.00</span></p>
+                <button class="btn-sell" id="btn-close" onclick="closePosition()" style="display:none;">Tutup Posisi (Close)</button>
+            </div>
+        </div>
+
+        <!-- TAB 2: CRYPTO MINING -->
+        <div id="tab-mining" class="tab-content" style="display: none;">
+            <div class="card" style="text-align: center;">
+                <h2>Rig Penambang Kripto</h2>
+                <p>Perangkat Saat Ini: <strong id="rig-name" style="color: #38bdf8;">HP Kentang (Single Core)</strong></p>
+                <p>Kecepatan Mining: <strong id="rig-speed" style="color: #22c55e;">0.001 BTC / menit</strong></p>
+                <hr style="border-color: #475569; margin: 15px 0;">
+                <p style="font-size: 12px; color: #94a3b8;">Saldo Kripto Ditambang:</p>
+                <h3 id="mining-balance" style="color: #fbbf24;">0.000000 BTC</h3>
+                <button class="btn-upgrade" onclick="cairkanCrypto()">Cairkan Kripto ke Saldo USD ($)</button>
+            </div>
+        </div>
+
+        <!-- TAB 3: UPGRADE SETUP PC & HARDWARE -->
+        <div id="tab-upgrade" class="tab-content" style="display: none;">
+            <div class="card">
+                <h2>Toko Hardware & Setup Trader</h2>
+                <p style="font-size: 12px; color: #94a3b8;">Upgrade spek PC untuk mempercepat mining crypto dan kelancaran trading!</p>
+                <div style="background: #1e293b; padding: 10px; border-radius: 6px; margin-bottom: 8px;">
+                    <strong>1. VGA Mining Rig (RTX 3060)</strong><br>
+                    <span style="font-size: 11px; color: #94a3b8;">Tambah kecepatan mining 5x lipat.</span><br>
+                    <button onclick="beliUpgrade('vga', 500)">Beli ($500)</button>
+                </div>
+                <div style="background: #1e293b; padding: 10px; border-radius: 6px;">
+                    <strong>2. PC Setup Multi-Monitor Pro</strong><br>
+                    <span style="font-size: 11px; color: #94a3b8;">Meningkatkan akurasi analisis market trading.</span><br>
+                    <button onclick="beliUpgrade('pc', 1200)">Beli ($1,200)</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOG AKTIVITAS -->
+        <div class="card">
+            <h2>Log Sistem</h2>
+            <div class="log-box" id="system-log">Sistem siap. Selamat datang di dunia Trader & Miner Tycoon!</div>
+        </div>
+    </div>
+
+    <script>
+        let game = {
+            usd: 1000.00,
+            crypto: 0.0000,
+            goldPrice: 2650.00,
+            position: null,
+            miningSpeed: 0.0001,
+            rigLevel: 1
+        };
+
+        // Simulasi Pergerakan Harga Emas (XAU/USD) Real-time
+        setInterval(() => {
+            let change = (Math.random() - 0.48) * 3.5;
+            game.goldPrice += change;
+            game.goldPrice = parseFloat(game.goldPrice.toFixed(2));
+            document.getElementById("chart-price").innerText = "$" + game.goldPrice.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+            if(game.position) {
+                let diff = game.goldPrice - game.position.entry;
+                let profit = game.position.type === 'BUY' ? diff * 10 : -diff * 10;
+                let plEl = document.getElementById("val-floating");
+                plEl.innerText = (profit >= 0 ? "+$" : "-$") + Math.abs(profit).toFixed(2);
+                plEl.style.color = profit >= 0 ? "#22c55e" : "#ef4444";
+            }
+        }, 1000);
+
+        // Simulasi Crypto Mining Berjalan Otomatis
+        setInterval(() => {
+            game.crypto += game.miningSpeed;
+            document.getElementById("val-crypto").innerText = game.crypto.toFixed(4) + " BTC";
+            document.getElementById("mining-balance").innerText = game.crypto.toFixed(6) + " BTC";
+        }, 1000);
+
+        function switchTab(tabName, btn) {
+            document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('tab-' + tabName).style.display = 'block';
+            btn.classList.add('active');
+        }
+
+        function openPosition(type) {
+            if(game.position) {
+                alert("Tutup posisi yang sedang aktif terlebih dahulu!");
+                return;
+            }
+            game.position = { type: type, entry: game.goldPrice };
+            document.getElementById("pos-status").innerText = `${type} di harga $${game.goldPrice}`;
+            document.getElementById("btn-close").style.display = "block";
+            log(`Membuka posisi ${type} di harga $${game.goldPrice}`);
+        }
+
+        function closePosition() {
+            let diff = game.goldPrice - game.position.entry;
+            let profit = game.position.type === 'BUY' ? diff * 10 : -diff * 10;
+            game.usd += profit;
+            
+            log(`Menutup posisi. Profit/Loss: ${profit >= 0 ? '+' : ''}$${profit.toFixed(2)}`);
+            
+            game.position = null;
+            document.getElementById("pos-status").innerText = "Tidak ada posisi aktif";
+            document.getElementById("val-floating").innerText = "$0.00";
+            document.getElementById("btn-close").style.display = "none";
+            updateUI();
+        }
+
+        function cairkanCrypto() {
+            if(game.crypto <= 0.0001) {
+                alert("Saldo kripto masih terlalu sedikit untuk dicairkan!");
+                return;
+            }
+            let usdEarned = game.crypto * 85000;
+            game.usd += usdEarned;
+            game.crypto = 0;
+            updateUI();
+            log(`Berhasil mencairkan kripto senilai $${usdEarned.toFixed(2)} ke kas USD!`);
+        }
+
+        function beliUpgrade(type, cost) {
+            if(game.usd >= cost) {
+                game.usd -= cost;
+                if(type === 'vga') {
+                    game.miningSpeed *= 5;
+                    document.getElementById("rig-name").innerText = "PC Gaming / Rig GPU RTX 3060";
+                    document.getElementById("rig-speed").innerText = "0.0005 BTC / detik";
+                    alert("Berhasil membeli VGA Mining Rig! Kecepatan penambangan kripto meningkat pesat.");
+                } else if(type === 'pc') {
+                    game.miningSpeed *= 3;
+                    document.getElementById("rig-name").innerText = "Professional Trading & Mining Station";
+                    alert("Berhasil upgrade PC Setup! Analisis market lebih stabil dan mining makin ngebut.");
+                }
+                updateUI();
+            } else {
+                alert("Saldo USD tidak cukup!");
+            }
+        }
+
+        function updateUI() {
+            document.getElementById("val-usd").innerText = "$" + game.usd.toLocaleString('en-US', {minimumFractionDigits: 2});
+        }
+
+        function log(text) {
+            let box = document.getElementById("system-log");
+            box.innerHTML += `> ${text}<br>`;
+            box.scrollTop = box.scrollHeight;
+        }
+    </script>
+
+</body>
+</html>
