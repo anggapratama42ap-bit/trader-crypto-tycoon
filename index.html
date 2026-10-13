@@ -3,37 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pro Trader Terminal</title>
+    <title>Trader Crypto Tycoon</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
         :root {
-            --bg-base: #030712;
-            --panel-bg: #090d19;
-            --border-color: #1e293b;
-            --accent-cyan: #06b6d4;
-            --accent-green: #10b981;
-            --accent-red: #ef4444;
-            --text-main: #f8fafc;
+            --bg-base: #f8fafc;
+            --panel-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --primary: #0284c7;
+            --success: #10b981;
+            --danger: #ef4444;
+            --text-main: #1e293b;
             --text-dim: #64748b;
         }
 
         body {
-            font-family: 'Rajdhani', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: var(--bg-base);
             color: var(--text-main);
             margin: 0;
-            padding: 10px;
+            padding: 15px;
         }
 
-        .terminal-container {
-            max-width: 650px;
+        .container {
+            max-width: 750px;
             margin: 0 auto;
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
-            border-radius: 8px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            padding: 20px;
         }
 
         .header-bar {
@@ -41,91 +41,95 @@
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-bottom: 12px;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
         }
 
         .logo {
-            font-family: 'Share Tech Mono', monospace;
-            color: var(--accent-cyan);
-            font-size: 16px;
-            letter-spacing: 1px;
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .wallet-display {
-            font-family: 'Share Tech Mono', monospace;
             font-size: 13px;
-            background: #020617;
-            padding: 5px 10px;
+            font-weight: 600;
+            background: #f1f5f9;
+            padding: 6px 12px;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: 8px;
         }
 
         /* Nav Tabs */
         .nav-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 6px;
-            margin-bottom: 12px;
+            gap: 8px;
+            margin-bottom: 15px;
         }
 
         .tab-btn {
-            background: #020617;
+            background: #f8fafc;
             color: var(--text-dim);
             border: 1px solid var(--border-color);
-            padding: 8px;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 12px;
+            padding: 10px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
-            border-radius: 4px;
+            border-radius: 8px;
             transition: all 0.2s;
+            text-align: center;
         }
 
         .tab-btn.active {
-            background: rgba(6, 182, 212, 0.1);
-            color: var(--accent-cyan);
-            border-color: var(--accent-cyan);
+            background: #e0f2fe;
+            color: var(--primary);
+            border-color: #7dd3fc;
         }
 
         .section-box {
-            background: #020617;
+            background: #ffffff;
             border: 1px solid var(--border-color);
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 10px;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
         }
 
         /* Pair Selector */
         .pair-selector {
             display: flex;
-            gap: 5px;
+            gap: 8px;
             overflow-x: auto;
-            padding-bottom: 5px;
-            margin-bottom: 10px;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
         }
         .pair-btn {
-            background: #090d19;
+            background: #f8fafc;
             color: var(--text-dim);
             border: 1px solid var(--border-color);
-            padding: 6px 12px;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 11px;
+            padding: 7px 14px;
+            font-size: 12px;
+            font-weight: 600;
             cursor: pointer;
-            border-radius: 3px;
+            border-radius: 6px;
             white-space: nowrap;
         }
         .pair-btn.active {
-            background: var(--accent-cyan);
-            color: #000;
-            font-weight: bold;
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
         }
 
-        /* TradingView Widget Container */
+        /* Chart TradingView Diperbesar agar Nyaman */
         .tv-chart-container {
-            height: 300px;
+            height: 450px;
             width: 100%;
-            margin-bottom: 10px;
-            border-radius: 4px;
+            margin-bottom: 15px;
+            border-radius: 8px;
             overflow: hidden;
             border: 1px solid var(--border-color);
         }
@@ -133,95 +137,95 @@
         .trade-controls {
             display: grid;
             grid-template-columns: 1fr 2fr;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 10px;
+            margin-bottom: 10px;
             align-items: center;
         }
 
         .trade-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 10px;
         }
 
         .btn-action {
-            padding: 10px;
-            font-family: 'Share Tech Mono', monospace;
-            font-weight: bold;
+            padding: 12px;
+            font-weight: 700;
             font-size: 14px;
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
         }
-        .btn-buy { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
-        .btn-buy:hover { background: var(--accent-green); color: #000; }
-        .btn-sell { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); border: 1px solid var(--accent-red); }
-        .btn-sell:hover { background: var(--accent-red); color: #fff; }
+        .btn-buy { background: #d1fae5; color: #065f46; border: 1px solid #10b981; }
+        .btn-buy:hover { background: #10b981; color: white; }
+        .btn-sell { background: #fee2e2; color: #991b1b; border: 1px solid #ef4444; }
+        .btn-sell:hover { background: #ef4444; color: white; }
 
         select, input {
-            background: #090d19;
-            color: white;
+            background: #f8fafc;
+            color: var(--text-main);
             border: 1px solid var(--border-color);
-            padding: 8px;
-            border-radius: 4px;
-            font-family: 'Share Tech Mono', monospace;
+            padding: 10px;
+            border-radius: 8px;
             font-size: 13px;
             width: 100%;
             box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         .terminal-log {
-            background: #010409;
+            background: #f8fafc;
             border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 8px;
-            height: 80px;
+            border-radius: 8px;
+            padding: 10px;
+            height: 90px;
             overflow-y: auto;
-            font-family: 'Share Tech Mono', monospace;
-            font-size: 11px;
-            color: var(--accent-cyan);
+            font-family: monospace;
+            font-size: 12px;
+            color: var(--text-dim);
         }
 
-        .upgrade-item {
-            background: #060913;
+        .rig-card {
+            background: #f8fafc;
             border: 1px solid var(--border-color);
-            padding: 8px;
-            border-radius: 4px;
-            margin-bottom: 6px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+        }
+
+        .btn-primary-custom {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-weight: 600;
             font-size: 12px;
-        }
-        .btn-tech {
-            background: transparent;
-            color: #f59e0b;
-            border: 1px solid #f59e0b;
-            padding: 5px 10px;
-            font-family: 'Share Tech Mono', monospace;
             cursor: pointer;
-            border-radius: 3px;
         }
-        .btn-tech:hover { background: #f59e0b; color: #000; }
+        .btn-primary-custom:hover { background: #0369a1; }
     </style>
 </head>
 <body>
 
-    <div class="terminal-container">
+    <div class="container">
         <!-- HEADER KEUANGAN -->
         <div class="header-bar">
-            <div class="logo">📈 PRO TRADER TERMINAL</div>
+            <div class="logo">📈 Trader Crypto Tycoon</div>
             <div class="wallet-display">
-                USD: <span id="val-usd" style="color: var(--accent-cyan);">$1,500.00</span> | 
-                BTC: <span id="val-crypto" style="color: #fbbf24;">0.0000</span>
+                USD: <span id="val-usd" style="color: var(--primary);">$1,500.00</span> | 
+                Portofolio Mined: <span id="val-crypto-summary" style="color: #d97706;">$0.00</span>
             </div>
         </div>
 
         <!-- NAV TAB -->
         <div class="nav-grid">
-            <button class="tab-btn active" onclick="switchTab('trading', this)">[01] FOREX & CRYPTO</button>
-            <button class="tab-btn" onclick="switchTab('mining', this)">[02] CRYPTO RIG</button>
-            <button class="tab-btn" onclick="switchTab('upgrade', this)">[03] HARDWARE</button>
+            <button class="tab-btn active" onclick="switchTab('trading', this)">Forex & Crypto Trading</button>
+            <button class="tab-btn" onclick="switchTab('mining', this)">Crypto Mining Farm</button>
+            <button class="tab-btn" onclick="switchTab('upgrade', this)">Toko Perangkat</button>
         </div>
 
         <!-- TAB 1: TRADING MARKET & TRADINGVIEW CHART -->
@@ -233,17 +237,17 @@
                     <button class="pair-btn" onclick="changePair('FX:EURUSD', 'EUR/USD', this)">EUR/USD</button>
                     <button class="pair-btn" onclick="changePair('FX:GBPUSD', 'GBP/USD', this)">GBP/USD</button>
                     <button class="pair-btn" onclick="changePair('FX:USDJPY', 'USD/JPY', this)">USD/JPY</button>
-                    <button class="pair-btn" onclick="changePair('BINANCE:BTCUSDT', 'BTC/USD', this)">BTC/USD</button>
-                    <button class="pair-btn" onclick="changePair('BINANCE:ETHUSDT', 'ETH/USD', this)">ETH/USD</button>
+                    <button class="pair-btn" onclick="changePair('BINANCE:BTCUSDT', 'BTC/USDT', this)">BTC/USDT</button>
+                    <button class="pair-btn" onclick="changePair('BINANCE:ETHUSDT', 'ETH/USDT', this)">ETH/USDT</button>
                 </div>
 
-                <!-- WIDGET TRADINGVIEW ASLI (REALTIME) -->
+                <!-- WIDGET TRADINGVIEW ASLI (UKURAN DIPERBESAR) -->
                 <div class="tv-chart-container" id="tradingview_widget"></div>
 
                 <!-- INPUT LOT & TOMBOL EKSEKUSI -->
                 <div class="trade-controls">
                     <div>
-                        <label style="font-size: 11px; color: var(--text-dim); display:block; margin-bottom:2px;">LOT SIZE:</label>
+                        <label style="font-size: 11px; font-weight: 600; color: var(--text-dim); display:block; margin-bottom:4px;">UKURAN LOT:</label>
                         <select id="lot-size">
                             <option value="0.01">0.01 Lot</option>
                             <option value="0.05">0.05 Lot</option>
@@ -252,7 +256,7 @@
                             <option value="1.0">1.00 Lot (Pro)</option>
                         </select>
                     </div>
-                    <div style="font-size: 11px; color: var(--text-dim); text-align: right;" id="pair-info-label">Pair: XAU/USD</div>
+                    <div style="font-size: 12px; font-weight: 600; color: var(--text-dim); text-align: right;" id="pair-info-label">Active: XAU/USD</div>
                 </div>
 
                 <div class="trade-buttons">
@@ -262,50 +266,62 @@
             </div>
 
             <div class="section-box">
-                <div style="font-size: 12px; font-family: 'Share Tech Mono'; margin-bottom: 5px; color: var(--text-dim);">POSISI AKTIF</div>
-                <div style="display: flex; justify-content: space-between; font-size: 13px; align-items: center;">
+                <div style="font-size: 13px; font-weight: 700; margin-bottom: 6px; color: var(--text-dim);">POSISI TERBUKA</div>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 600; align-items: center;">
                     <span id="pos-info">Tidak ada posisi terbuka</span>
-                    <span id="pos-pl" style="font-family: 'Share Tech Mono';">$0.00</span>
+                    <span id="pos-pl">$0.00</span>
                 </div>
-                <button id="btn-close" class="btn-action btn-sell" style="margin-top: 8px; display:none; padding: 6px; font-size: 12px;" onclick="closePosition()">TUTUP POSISI</button>
+                <button id="btn-close" class="btn-action btn-sell" style="margin-top: 10px; display:none; padding: 8px; font-size: 13px;" onclick="closePosition()">TUTUP POSISI</button>
             </div>
         </div>
 
-        <!-- TAB 2: MINING -->
+        <!-- TAB 2: MINING FARM -->
         <div id="tab-mining" class="tab-content" style="display: none;">
-            <div class="section-box" style="text-align: center; padding: 20px;">
-                <div style="color: var(--text-dim); font-size: 12px; font-family: 'Share Tech Mono';">STATUS RIG MINING</div>
-                <h3 id="rig-name" style="color: var(--accent-cyan); margin: 5px 0;">HP Kentang (Single Core)</h3>
-                <p style="font-size: 12px; color: var(--text-dim);">Kecepatan Hash: <span style="color: var(--accent-green);" id="rig-speed">0.0001 BTC/dtk</span></p>
-                
-                <div style="margin: 20px 0;">
-                    <div style="font-size: 11px; color: var(--text-dim);">SALDO MINED:</div>
-                    <h2 id="mining-balance" style="color: #fbbf24; font-family: 'Share Tech Mono'; margin: 5px 0;">0.000000 BTC</h2>
+            <div class="section-box">
+                <h3 style="margin-top: 0; color: var(--text-main);">Farm Penambangan Kripto</h3>
+                <p style="font-size: 13px; color: var(--text-dim);">Anda harus membeli perangkat mining di menu Toko Perangkat sebelum dapat menambang koin tertentu.</p>
+                <div id="mining-rigs-list" style="margin-top: 15px;">
+                    <!-- Diisi via JavaScript -->
                 </div>
-                <button class="btn-tech" style="width: 100%; padding: 10px; background: rgba(245, 158, 11, 0.1);" onclick="cairkanCrypto()">CAIRKAN KE USD WALLET</button>
             </div>
         </div>
 
-        <!-- TAB 3: UPGRADE HARDWARE -->
+        <!-- TAB 3: TOKO PERANGKAT -->
         <div id="tab-upgrade" class="tab-content" style="display: none;">
             <div class="section-box">
-                <div style="font-size: 12px; font-family: 'Share Tech Mono'; margin-bottom: 10px; color: var(--text-dim);">HARDWARE WORKSTATION & RIG</div>
+                <h3 style="margin-top: 0; color: var(--text-main);">Toko Hardware & Rig Mining</h3>
+                <p style="font-size: 13px; color: var(--text-dim);">Beli perangkat spesifik untuk membuka dan menambang koin kripto pilihanmu.</p>
                 
-                <div class="upgrade-item">
-                    <div><strong>VGA Mining Rig (RTX 3060)</strong><br><span style="font-size: 10px; color: var(--text-dim);">Boost kecepatan crypto mining 5x</span></div>
-                    <button class="btn-tech" onclick="beliUpgrade('vga', 400)">$400</button>
+                <div class="rig-card">
+                    <div>
+                        <strong>USB Antminer (Basic)</strong><br>
+                        <span style="font-size: 11px; color: var(--text-dim);">Khusus untuk menambang <strong>Dogecoin (DOGE)</strong>.</span>
+                    </div>
+                    <button class="btn-primary-custom" onclick="beliPerangkat('doge', 'USB Antminer', 250)">Beli ($250)</button>
                 </div>
-                <div class="upgrade-item">
-                    <div><strong>Quantum Terminal Display</strong><br><span style="font-size: 10px; color: var(--text-dim);">Stabilitas workstation trading</span></div>
-                    <button class="btn-tech" onclick="beliUpgrade('terminal', 900)">$900</button>
+
+                <div class="rig-card">
+                    <div>
+                        <strong>GPU Rig RTX 3060</strong><br>
+                        <span style="font-size: 11px; color: var(--text-dim);">Khusus untuk menambang <strong>Ethereum (ETH)</strong>.</span>
+                    </div>
+                    <button class="btn-primary-custom" onclick="beliPerangkat('eth', 'GPU Rig RTX 3060', 800)">Beli ($800)</button>
+                </div>
+
+                <div class="rig-card">
+                    <div>
+                        <strong>ASIC Miner Antminer S19 Pro</strong><br>
+                        <span style="font-size: 11px; color: var(--text-dim);">Khusus untuk menambang <strong>Bitcoin (BTC)</strong>.</span>
+                    </div>
+                    <button class="btn-primary-custom" onclick="beliPerangkat('btc', 'ASIC Antminer S19', 2000)">Beli ($2,000)</button>
                 </div>
             </div>
         </div>
 
         <!-- TERMINAL LOG -->
         <div class="section-box" style="margin-bottom: 0;">
-            <div style="font-size: 10px; font-family: 'Share Tech Mono'; color: var(--text-dim); margin-bottom: 4px;">SYSTEM_LOGS //</div>
-            <div class="terminal-log" id="system-log">> Terminal siap. Hubungkan chart dan mulai trading.<br></div>
+            <div style="font-size: 11px; font-weight: 700; color: var(--text-dim); margin-bottom: 4px;">SYSTEM LOGS //</div>
+            <div class="terminal-log" id="system-log">> Sistem siap. Silakan mulai aktivitas trading atau beli perangkat mining.<br></div>
         </div>
     </div>
 
@@ -318,26 +334,24 @@
 
         let game = {
             usd: 1500.00,
-            crypto: 0.0000,
             position: null,
-            miningSpeed: 0.0001
+            ownedRigs: [], // Perangkat yang sudah dibeli
+            minedCoins: { doge: 0, eth: 0, btc: 0 }
         };
 
-        // Muat Chart TradingView Real-time
         function loadTradingView(symbol) {
             document.getElementById("tradingview_widget").innerHTML = "";
             tvWidget = new TradingView.widget({
                 "width": "100%",
                 "height": "100%",
                 "symbol": symbol,
-                "interval": "1",
+                "interval": "5",
                 "timezone": "Etc/UTC",
-                "theme": "dark",
+                "theme": "light",
                 "style": "1",
                 "locale": "id",
-                "toolbar_bg": "#090d19",
+                "toolbar_bg": "#f8fafc",
                 "enable_publishing": false,
-                "hide_side_toolbar": false,
                 "allow_symbol_change": false,
                 "container_id": "tradingview_widget"
             });
@@ -350,7 +364,7 @@
             }
             currentSymbol = symbol;
             currentPairName = name;
-            document.getElementById("pair-info-label").innerText = "Pair: " + name;
+            document.getElementById("pair-info-label").innerText = "Active: " + name;
 
             document.querySelectorAll('.pair-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
@@ -359,25 +373,87 @@
             log(`Meralih market view ke ${name}`);
         }
 
-        // Background Crypto Mining Loop
+        // Background Mining & Floating P/L Loop
         setInterval(() => {
-            game.crypto += game.miningSpeed;
-            document.getElementById("val-crypto").innerText = game.crypto.toFixed(4);
-            document.getElementById("mining-balance").innerText = game.crypto.toFixed(6) + " BTC";
+            // Tambah koin jika punya rig yang sesuai
+            if(game.ownedRigs.includes('doge')) game.minedCoins.doge += 0.5;
+            if(game.ownedRigs.includes('eth')) game.minedCoins.eth += 0.0002;
+            if(game.ownedRigs.includes('btc')) game.minedCoins.btc += 0.00001;
 
-            // Simulasi Floating P/L sederhana jika ada posisi terbuka
+            updateMiningDisplay();
+
+            // Simulasi Floating P/L trading
             if(game.position) {
                 let lot = game.position.lot;
-                // Simulasi fluktuasi profit berdasarkan lot
-                let randomFluctuation = (Math.random() - 0.49) * 12 * lot;
+                let randomFluctuation = (Math.random() - 0.49) * 15 * lot;
                 game.position.currentPl += randomFluctuation;
                 
                 let plEl = document.getElementById("pos-pl");
                 let plVal = game.position.currentPl;
                 plEl.innerText = (plVal >= 0 ? "+$" : "-$") + Math.abs(plVal).toFixed(2);
-                plEl.style.color = plVal >= 0 ? "var(--accent-green)" : "var(--accent-red)";
+                plEl.style.color = plVal >= 0 ? "var(--success)" : "var(--danger)";
             }
         }, 1000);
+
+        function updateMiningDisplay() {
+            let container = document.getElementById("mining-rigs-list");
+            if(game.ownedRigs.length === 0) {
+                container.innerHTML = `<p style="color: var(--danger); font-size: 13px; font-weight: 600;">Belum ada perangkat mining yang dimiliki. Silakan beli di menu "Toko Perangkat".</p>`;
+                document.getElementById("val-crypto-summary").innerText = "$0.00";
+                return;
+            }
+
+            let html = "";
+            let totalVal = 0;
+
+            if(game.ownedRigs.includes('doge')) {
+                let usdVal = game.minedCoins.doge * 0.15; // Estimasi harga DOGE
+                totalVal += usdVal;
+                html += `<div class="rig-card"><div><strong>USB Antminer (DOGE Rig)</strong><br>Hasil: ${game.minedCoins.doge.toFixed(2)} DOGE (~$${usdVal.toFixed(2)})</div><button class="btn-primary-custom" onclick="cairkan('doge', ${usdVal})">Cairkan ke USD</button></div>`;
+            }
+            if(game.ownedRigs.includes('eth')) {
+                let usdVal = game.minedCoins.eth * 3200; // Estimasi harga ETH
+                totalVal += usdVal;
+                html += `<div class="rig-card"><div><strong>GPU RTX 3060 (ETH Rig)</strong><br>Hasil: ${game.minedCoins.eth.toFixed(4)} ETH (~$${usdVal.toFixed(2)})</div><button class="btn-primary-custom" onclick="cairkan('eth', ${usdVal})">Cairkan ke USD</button></div>`;
+            }
+            if(game.ownedRigs.includes('btc')) {
+                let usdVal = game.minedCoins.btc * 85000; // Estimasi harga BTC
+                totalVal += usdVal;
+                html += `<div class="rig-card"><div><strong>ASIC Antminer (BTC Rig)</strong><br>Hasil: ${game.minedCoins.btc.toFixed(6)} BTC (~$${usdVal.toFixed(2)})</div><button class="btn-primary-custom" onclick="cairkan('btc', ${usdVal})">Cairkan ke USD</button></div>`;
+            }
+
+            container.innerHTML = html;
+            document.getElementById("val-crypto-summary").innerText = "$" + totalVal.toFixed(2);
+        }
+
+        function beliPerangkat(type, name, cost) {
+            if(game.ownedRigs.includes(type)) {
+                alert("Anda sudah memiliki perangkat ini!");
+                return;
+            }
+            if(game.usd >= cost) {
+                game.usd -= cost;
+                game.ownedRigs.push(type);
+                updateUI();
+                updateMiningDisplay();
+                alert(`Berhasil membeli ${name}! Perangkat mulai menambang.`);
+                log(`Membeli perangkat ${name} seharga $${cost}`);
+            } else {
+                alert("Saldo USD tidak mencukupi!");
+            }
+        }
+
+        function cairkan(coin, amount) {
+            if(amount < 1) {
+                alert("Nilai hasil tambang terlalu kecil untuk dicairkan!");
+                return;
+            }
+            game.usd += amount;
+            game.minedCoins[coin] = 0;
+            updateUI();
+            updateMiningDisplay();
+            log(`Berhasil mencairkan hasil tambang ${coin.toUpperCase()} senilai +$${amount.toFixed(2)}`);
+        }
 
         function switchTab(tabName, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
@@ -411,37 +487,6 @@
             document.getElementById("btn-close").style.display = "none";
         }
 
-        function cairkanCrypto() {
-            if(game.crypto < 0.0001) {
-                alert("Saldo kripto terlalu sedikit!");
-                return;
-            }
-            let earned = game.crypto * 85000;
-            game.usd += earned;
-            game.crypto = 0;
-            updateUI();
-            log(`MINING PAYOUT: Ditukar ke USD senilai +$${earned.toFixed(2)}`);
-        }
-
-        function beliUpgrade(type, cost) {
-            if(game.usd >= cost) {
-                game.usd -= cost;
-                if(type === 'vga') {
-                    game.miningSpeed *= 5;
-                    document.getElementById("rig-name").innerText = "Rig GPU RTX 3060 [TURBO]";
-                    document.getElementById("rig-speed").innerText = "0.0005 BTC/dtk";
-                    alert("Upgrade VGA berhasil! Hashrate mining melesat.");
-                } else if(type === 'terminal') {
-                    game.miningSpeed *= 2;
-                    alert("Quantum Terminal terpasang!");
-                }
-                updateUI();
-                log(`HARDWARE UPGRADE INSTALLED: ${type}`);
-            } else {
-                alert("USD Wallet tidak mencukupi!");
-            }
-        }
-
         function updateUI() {
             document.getElementById("val-usd").innerText = "$" + game.usd.toLocaleString('en-US', {minimumFractionDigits: 2});
         }
@@ -452,9 +497,9 @@
             box.scrollTop = box.scrollHeight;
         }
 
-        // Inisialisasi awal load chart TradingView
         window.onload = function() {
             loadTradingView(currentSymbol);
+            updateMiningDisplay();
         };
     </script>
 
