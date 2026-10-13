@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trader Crypto Tycoon</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Share+Tech+Mono&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
 
         :root {
             --bg-base: #f8fafc;
@@ -27,7 +27,7 @@
         }
 
         .container {
-            max-width: 820px;
+            max-width: 850px;
             margin: 0 auto;
             background: var(--panel-bg);
             border: 1px solid var(--border-color);
@@ -120,50 +120,14 @@
             border-color: var(--primary);
         }
 
-        .tf-selector {
-            display: flex;
-            gap: 4px;
-        }
-        .tf-btn {
-            background: #f1f5f9;
-            border: 1px solid var(--border-color);
-            padding: 4px 8px;
-            font-size: 10px;
-            font-weight: bold;
-            cursor: pointer;
-            border-radius: 4px;
-            color: var(--text-dim);
-        }
-        .tf-btn.active {
-            background: var(--text-main);
-            color: white;
-        }
-
-        /* Custom Chart Ala Platform Broker */
-        .chart-container-custom {
-            height: 400px;
+        /* TradingView Candlestick Chart Container (Luas & Profesional) */
+        .tv-chart-wrapper {
+            height: 450px;
             width: 100%;
-            background: #090d16;
             border-radius: 8px;
-            position: relative;
-            margin-bottom: 15px;
             overflow: hidden;
             border: 1px solid #1e293b;
-        }
-        canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
-        .chart-header-info {
-            position: absolute;
-            top: 10px;
-            left: 12px;
-            font-family: 'Share Tech Mono', monospace;
-            color: #94a3b8;
-            font-size: 12px;
-            z-index: 5;
-            pointer-events: none;
+            margin-bottom: 15px;
         }
 
         .trade-controls {
@@ -272,29 +236,20 @@
         <!-- TAB 1: TRADING MARKET -->
         <div id="tab-trading" class="tab-content">
             <div class="section-box">
-                <!-- TOOLBAR: PAIR & TIMEFRAME -->
+                <!-- TOOLBAR: PAIR -->
                 <div class="market-toolbar">
                     <div class="pair-selector">
-                        <button class="pair-btn active" onclick="changePair('XAUUSD', 'XAU/USD', 4183.04, this)">XAU/USD</button>
-                        <button class="pair-btn" onclick="changePair('BTCUSDT', 'BTC/USDT', 85000, this)">BTC/USDT</button>
-                        <button class="pair-btn" onclick="changePair('ETHUSDT', 'ETH/USDT', 3200, this)">ETH/USDT</button>
-                        <button class="pair-btn" onclick="changePair('EURUSD', 'EUR/USD', 1.085, this)">EUR/USD</button>
-                        <button class="pair-btn" onclick="changePair('GBPUSD', 'GBP/USD', 1.302, this)">GBP/USD</button>
-                        <button class="pair-btn" onclick="changePair('USDJPY', 'USD/JPY', 152.5, this)">USD/JPY</button>
-                    </div>
-                    <div class="tf-selector">
-                        <button class="tf-btn" onclick="setTF('M1', this)">M1</button>
-                        <button class="tf-btn" onclick="setTF('M5', this)">M5</button>
-                        <button class="tf-btn" onclick="setTF('H1', this)">H1</button>
-                        <button class="tf-btn active" onclick="setTF('D1', this)">D1</button>
+                        <button class="pair-btn active" onclick="changePair('FX_IDC:XAUUSD', 'XAU/USD', this)">XAU/USD</button>
+                        <button class="pair-btn" onclick="changePair('BINANCE:BTCUSDT', 'BTC/USDT', this)">BTC/USDT</button>
+                        <button class="pair-btn" onclick="changePair('BINANCE:ETHUSDT', 'ETH/USDT', this)">ETH/USDT</button>
+                        <button class="pair-btn" onclick="changePair('FX:EURUSD', 'EUR/USD', this)">EUR/USD</button>
+                        <button class="pair-btn" onclick="changePair('FX:GBPUSD', 'GBP/USD', this)">GBP/USD</button>
+                        <button class="pair-btn" onclick="changePair('FX:USDJPY', 'USD/JPY', this)">USD/JPY</button>
                     </div>
                 </div>
 
-                <!-- CUSTOM CHART DENGAN SUMBU HARGA DI KANAN & GRID -->
-                <div class="chart-container-custom">
-                    <div class="chart-header-info" id="chart-info-header">XAU/USD | TF: D1 | Price: <span style="color:#38bdf8" id="live-price-text">4183.04</span></div>
-                    <canvas id="brokerCanvas"></canvas>
-                </div>
+                <!-- TRADINGVIEW WIDGET (CANDLESTICK CHART REALTIME) -->
+                <div class="tv-chart-wrapper" id="tradingview_widget"></div>
 
                 <!-- INPUT LOT & TOMBOL EKSEKUSI -->
                 <div class="trade-controls">
@@ -375,13 +330,12 @@
         </div>
     </div>
 
+    <!-- SCRIPT TRADINGVIEW CANDLESTICK WIDGET -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
     <script>
-        let currentPair = "XAUUSD";
+        let tvWidget = null;
+        let currentSymbol = "FX_IDC:XAUUSD";
         let currentPairName = "XAU/USD";
-        let currentPrice = 4183.04;
-        let currentTimeframe = "D1";
-        let priceHistory = [];
-        for(let i=0; i<45; i++) priceHistory.push(currentPrice);
 
         let game = {
             usd: 1500.00,
@@ -390,23 +344,42 @@
             minedCoins: { doge: 0, eth: 0, btc: 0 }
         };
 
-        // Simulasi Realtime Harga Broker
-        function updateMarketPrice() {
-            let volatility = currentPrice * 0.0008;
-            let change = (Math.random() - 0.48) * volatility;
-            currentPrice += change;
-            currentPrice = parseFloat(currentPrice.toFixed(currentPair === 'USDJPY' ? 2 : 4));
-
-            priceHistory.push(currentPrice);
-            if(priceHistory.length > 45) priceHistory.shift();
+        function loadTradingView(symbol) {
+            document.getElementById("tradingview_widget").innerHTML = "";
+            tvWidget = new TradingView.widget({
+                "width": "100%",
+                "height": "100%",
+                "symbol": symbol,
+                "interval": "D",
+                "timezone": "Etc/UTC",
+                "theme": "dark",
+                "style": "1", // Style 1 adalah Candlestick Chart profesional
+                "locale": "id",
+                "toolbar_bg": "#090d19",
+                "enable_publishing": false,
+                "allow_symbol_change": false,
+                "container_id": "tradingview_widget"
+            });
         }
 
-        // Loop utama chart broker & mining
-        setInterval(() => {
-            updateMarketPrice();
-            document.getElementById("live-price-text").innerText = currentPrice;
-            drawBrokerChart();
+        function changePair(symbol, name, btn) {
+            if(game.position) {
+                alert("Selesaikan posisi aktif pada pair saat ini terlebih dahulu!");
+                return;
+            }
+            currentSymbol = symbol;
+            currentPairName = name;
+            document.getElementById("pair-info-label").innerText = "Active: " + name;
 
+            document.querySelectorAll('.pair-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            loadTradingView(symbol);
+            log(`Berpindah market ke ${name}`);
+        }
+
+        // Loop background mining & simulasi fluktuasi P/L trading real-time
+        setInterval(() => {
             // Mining progress
             Object.keys(game.rigs).forEach(coin => {
                 let r = game.rigs[coin];
@@ -414,109 +387,18 @@
             });
             updateMiningDisplay();
 
-            // P/L Posisi Aktif
+            // P/L Posisi Aktif dengan validasi saldo
             if(game.position) {
-                let diff = currentPrice - game.position.entry;
-                let rawPl = game.position.type === 'BUY' ? diff : -diff;
-                let profit = rawPl * game.position.lot * (currentPair === 'USDJPY' ? 100 : 50);
+                let lot = game.position.lot;
+                let randomFluctuation = (Math.random() - 0.49) * 25 * lot;
+                game.position.currentPl += randomFluctuation;
                 
-                game.position.currentPl = profit;
                 let plEl = document.getElementById("pos-pl");
-                plEl.innerText = (profit >= 0 ? "+$" : "-$") + Math.abs(profit).toFixed(2);
-                plEl.style.color = profit >= 0 ? "var(--success)" : "var(--danger)";
+                let plVal = game.position.currentPl;
+                plEl.innerText = (plVal >= 0 ? "+$" : "-$") + Math.abs(plVal).toFixed(2);
+                plEl.style.color = plVal >= 0 ? "var(--success)" : "var(--danger)";
             }
         }, 1000);
-
-        function drawBrokerChart() {
-            let canvas = document.getElementById("brokerCanvas");
-            let ctx = canvas.getContext("2d");
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            let paddingRight = 80; // Ruang untuk sumbu harga di kanan
-            let chartWidth = canvas.width - paddingRight;
-
-            let min = Math.min(...priceHistory);
-            let max = Math.max(...priceHistory);
-            let range = max - min === 0 ? 1 : max - min;
-            let stepX = chartWidth / (priceHistory.length - 1);
-
-            // Garis Grid Vertikal & Horizontal ala MetaTrader
-            ctx.strokeStyle = "#1e293b";
-            ctx.lineWidth = 1;
-            for(let i=1; i<5; i++) {
-                let y = (canvas.height / 5) * i;
-                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(chartWidth, y); ctx.stroke();
-            }
-            for(let i=1; i<6; i++) {
-                let x = (chartWidth / 6) * i;
-                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
-            }
-
-            // Gambar Sumbu Harga di Sisi Kanan
-            ctx.fillStyle = "#64748b";
-            ctx.font = "10px monospace";
-            for(let i=0; i<=5; i++) {
-                let val = min + (range / 5) * (5 - i);
-                let y = (canvas.height / 5) * i + 12;
-                ctx.fillText(val.toFixed(2), chartWidth + 10, y);
-                
-                // Garis putus-putus harga ke kiri
-                ctx.strokeStyle = "rgba(100, 116, 139, 0.2)";
-                ctx.beginPath(); ctx.moveTo(0, y-4); ctx.lineTo(chartWidth, y-4); ctx.stroke();
-            }
-
-            // Garis Grafik Utama (Warna Cyan Terang)
-            ctx.beginPath();
-            ctx.strokeStyle = "#38bdf8";
-            ctx.lineWidth = 2;
-
-            priceHistory.forEach((val, i) => {
-                let x = i * stepX;
-                let y = canvas.height - ((val - min) / range) * (canvas.height - 30) - 15;
-                if(i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            });
-            ctx.stroke();
-
-            // Indikator Garis Harga Terkini di Kanan
-            let currentY = canvas.height - ((currentPrice - min) / range) * (canvas.height - 30) - 15;
-            ctx.fillStyle = "#38bdf8";
-            ctx.fillRect(chartWidth, currentY - 8, paddingRight, 16);
-            ctx.fillStyle = "#000";
-            ctx.font = "bold 10px monospace";
-            ctx.fillText(currentPrice.toFixed(2), chartWidth + 8, currentY + 4);
-        }
-
-        function changePair(symbol, name, defaultPrice, btn) {
-            if(game.position) {
-                alert("Selesaikan posisi aktif pada pair saat ini terlebih dahulu!");
-                return;
-            }
-            currentPair = symbol;
-            currentPairName = name;
-            currentPrice = defaultPrice;
-            priceHistory = [];
-            for(let i=0; i<45; i++) priceHistory.push(defaultPrice);
-
-            document.getElementById("pair-info-label").innerText = "Active: " + name;
-            document.getElementById("chart-info-header").innerHTML = `${name} | TF: ${currentTimeframe} | Price: <span style="color:#38bdf8" id="live-price-text">${defaultPrice}</span>`;
-            
-            document.querySelectorAll('.pair-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            log(`Berpindah market ke ${name}`);
-        }
-
-        function setTF(tf, btn) {
-            currentTimeframe = tf;
-            document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById("chart-info-header").innerHTML = `${currentPairName} | TF: ${tf} | Price: <span style="color:#38bdf8" id="live-price-text">${currentPrice}</span>`;
-            log(`Timeframe diubah ke ${tf}`);
-        }
 
         function updateMiningDisplay() {
             let container = document.getElementById("mining-rigs-list");
@@ -602,7 +484,7 @@
 
         function switchTab(tabName, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + tabName).style.display = 'block';
             btn.classList.add('active');
         }
@@ -612,12 +494,19 @@
                 alert("Tutup posisi aktif terlebih dahulu!");
                 return;
             }
+            // Validasi Saldo: Tidak bisa trading jika saldo USD 0 atau kurang
+            if(game.usd <= 0) {
+                alert("Margin Error: Saldo USD Anda $0.00! Tidak dapat membuka posisi trading.");
+                log(`ORDER REJECTED: Saldo tidak mencukupi untuk membuka posisi ${type}`);
+                return;
+            }
+
             let lot = parseFloat(document.getElementById("lot-size").value);
-            game.position = { pair: currentPairName, type: type, lot: lot, entry: currentPrice, currentPl: 0 };
+            game.position = { pair: currentPairName, type: type, lot: lot, currentPl: 0 };
             
-            document.getElementById("pos-info").innerText = `${type} [${currentPairName}] - ${lot} Lot @ ${currentPrice}`;
+            document.getElementById("pos-info").innerText = `${type} [${currentPairName}] - ${lot} Lot`;
             document.getElementById("btn-close").style.display = "block";
-            log(`ORDER: ${type} ${currentPairName} (${lot} Lot) di harga ${currentPrice}`);
+            log(`ORDER: ${type} ${currentPairName} (${lot} Lot) berhasil dieksekusi.`);
         }
 
         function closePosition() {
@@ -643,6 +532,7 @@
         }
 
         window.onload = function() {
+            loadTradingView(currentSymbol);
             updateMiningDisplay();
         };
     </script>
