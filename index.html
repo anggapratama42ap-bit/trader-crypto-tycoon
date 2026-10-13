@@ -3,251 +3,455 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trader & Crypto Tycoon Simulator</title>
+    <title>TERMINAL // NEXUS TRADER v2.4</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@500;700&display=swap');
+
+        :root {
+            --bg-base: #030712;
+            --panel-bg: #090d19;
+            --border-color: #1e293b;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --text-main: #f8fafc;
+            --text-dim: #64748b;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #0b0f19;
-            color: #ffffff;
+            font-family: 'Rajdhani', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-main);
             margin: 0;
+            padding: 10px;
+        }
+
+        .terminal-container {
+            max-width: 650px;
+            margin: 0 auto;
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.1);
             padding: 15px;
         }
-        .container {
-            max-width: 600px;
-            margin: 10px auto;
-            background: #1e293b;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
-        }
-        h1, h2 { color: #38bdf8; text-align: center; margin-top: 5px; }
-        .card {
-            background: #334155;
-            padding: 12px;
-            border-radius: 8px;
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
             margin-bottom: 12px;
         }
-        button {
-            background-color: #22c55e;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            font-size: 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 6px;
-            font-weight: bold;
-        }
-        button:hover { background-color: #16a34a; }
-        .btn-sell { background-color: #ef4444; }
-        .btn-sell:hover { background-color: #dc2626; }
-        .btn-upgrade { background-color: #f59e0b; color: black; }
-        .btn-upgrade:hover { background-color: #d97706; }
 
-        /* Navbar Menu Tab */
-        .navbar {
-            display: flex;
-            justify-content: space-around;
-            background: #0f172a;
-            padding: 8px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+        .logo {
+            font-family: 'Share Tech Mono', monospace;
+            color: var(--accent-cyan);
+            font-size: 16px;
+            letter-spacing: 1px;
         }
-        .nav-btn {
-            background: transparent;
-            color: #94a3b8;
-            border: none;
-            padding: 6px 10px;
+
+        .wallet-display {
+            font-family: 'Share Tech Mono', monospace;
             font-size: 13px;
-            cursor: pointer;
-            font-weight: bold;
-            width: auto;
-            margin: 0;
-        }
-        .nav-btn.active {
-            color: #38bdf8;
-            border-bottom: 2px solid #38bdf8;
+            background: #020617;
+            padding: 5px 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
         }
 
-        .chart-box {
-            background: #0f172a;
-            border: 1px solid #475569;
+        /* Nav Tabs */
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .tab-btn {
+            background: #020617;
+            color: var(--text-dim);
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            background: rgba(6, 182, 212, 0.1);
+            color: var(--accent-cyan);
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+        }
+
+        .section-box {
+            background: #020617;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
-            padding: 10px;
-            text-align: center;
-            font-family: monospace;
-            font-size: 18px;
-            color: #22c55e;
+            padding: 12px;
             margin-bottom: 10px;
         }
-        .log-box {
-            background: #0f172a;
-            padding: 8px;
-            border-radius: 6px;
-            height: 90px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 12px;
-            color: #38bdf8;
+
+        /* Pair Selector */
+        .pair-selector {
+            display: flex;
+            gap: 5px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
         }
-        .stat-grid {
+        .pair-btn {
+            background: #090d19;
+            color: var(--text-dim);
+            border: 1px solid var(--border-color);
+            padding: 5px 10px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            cursor: pointer;
+            border-radius: 3px;
+            white-space: nowrap;
+        }
+        .pair-btn.active {
+            background: var(--accent-cyan);
+            color: #000;
+            font-weight: bold;
+        }
+
+        /* Chart Canvas Styling */
+        .chart-wrapper {
+            position: relative;
+            height: 140px;
+            background: #010409;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .price-display {
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .trade-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 8px;
-            font-size: 13px;
         }
+
+        .btn-action {
+            padding: 10px;
+            font-family: 'Share Tech Mono', monospace;
+            font-weight: bold;
+            font-size: 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-buy { background: rgba(16, 185, 129, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green); }
+        .btn-buy:hover { background: var(--accent-green); color: #000; }
+        .btn-sell { background: rgba(239, 68, 68, 0.2); color: var(--accent-red); border: 1px solid var(--accent-red); }
+        .btn-sell:hover { background: var(--accent-red); color: #fff; }
+
+        .terminal-log {
+            background: #010409;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 8px;
+            height: 80px;
+            overflow-y: auto;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 11px;
+            color: var(--accent-cyan);
+        }
+
+        .upgrade-item {
+            background: #060913;
+            border: 1px solid var(--border-color);
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+        }
+        .btn-tech {
+            background: transparent;
+            color: #f59e0b;
+            border: 1px solid #f59e0b;
+            padding: 5px 10px;
+            font-family: 'Share Tech Mono', monospace;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .btn-tech:hover { background: #f59e0b; color: #000; }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>💻 Trader & Miner Tycoon</h1>
-        
-        <!-- INFO PANEL KEUANGAN -->
-        <div class="card" style="padding: 10px; display: flex; justify-content: space-between; font-size: 13px;">
-            <span>Modal USD: <strong id="val-usd" style="color: #38bdf8;">$1,000.00</strong></span>
-            <span>Crypto Mined: <strong id="val-crypto" style="color: #fbbf24;">0.0000 BTC</strong></span>
+    <div class="terminal-container">
+        <!-- HEADER KEUANGAN -->
+        <div class="header-bar">
+            <div class="logo">⚡ NEXUS_TERMINAL // v2.4</div>
+            <div class="wallet-display">
+                USD: <span id="val-usd" style="color: var(--accent-cyan);">$1,500.00</span> | 
+                BTC: <span id="val-crypto" style="color: #fbbf24;">0.0000</span>
+            </div>
         </div>
 
-        <!-- NAVBAR TAB -->
-        <div class="navbar">
-            <button class="nav-btn active" onclick="switchTab('trading', this)">📈 Forex Trading</button>
-            <button class="nav-btn" onclick="switchTab('mining', this)">⛏️ Crypto Mining</button>
-            <button class="nav-btn" onclick="switchTab('upgrade', this)">🖥️ Toko Upgrade PC</button>
+        <!-- NAV TAB -->
+        <div class="nav-grid">
+            <button class="tab-btn active" onclick="switchTab('trading', this)">[01] TRADING_FX</button>
+            <button class="tab-btn" onclick="switchTab('mining', this)">[02] CRYPTO_RIG</button>
+            <button class="tab-btn" onclick="switchTab('upgrade', this)">[03] HARDWARE</button>
         </div>
 
-        <!-- TAB 1: FOREX TRADING (XAU/USD) -->
+        <!-- TAB 1: TRADING MARKET & CHART -->
         <div id="tab-trading" class="tab-content">
-            <div class="card">
-                <h2>XAU/USD (Gold) Live Chart</h2>
-                <div class="chart-box" id="chart-price">$2,650.00</div>
-                <div class="stat-grid">
-                    <button onclick="openPosition('BUY')">🟢 BUY (Long)</button>
-                    <button class="btn-sell" onclick="openPosition('SELL')">🔴 SELL (Short)</button>
+            <div class="section-box">
+                <!-- PILIH PAIR -->
+                <div class="pair-selector" id="pair-list">
+                    <!-- Pair akan diisi otomatis via JS -->
+                </div>
+
+                <!-- LIVE PRICE & CHART -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <div style="font-size: 11px; color: var(--text-dim);" id="active-pair-label">XAU/USD (GOLD)</div>
+                        <div class="price-display" id="active-price">$2,650.00</div>
+                    </div>
+                    <div id="price-change" style="font-family: 'Share Tech Mono'; font-size: 13px; color: var(--accent-green);">+0.00%</div>
+                </div>
+
+                <div class="chart-wrapper">
+                    <canvas id="priceChart"></canvas>
+                </div>
+
+                <div class="trade-buttons">
+                    <button class="btn-action btn-buy" onclick="openPosition('BUY')">▲ BUY / LONG</button>
+                    <button class="btn-action btn-sell" onclick="openPosition('SELL')">▼ SELL / SHORT</button>
                 </div>
             </div>
-            <div class="card">
-                <h2>Posisi Terbuka</h2>
-                <p>Status: <span id="pos-status" style="color: #94a3b8;">Tidak ada posisi aktif</span></p>
-                <p>Floating P/L: <span id="val-floating">$0.00</span></p>
-                <button class="btn-sell" id="btn-close" onclick="closePosition()" style="display:none;">Tutup Posisi (Close)</button>
+
+            <div class="section-box">
+                <div style="font-size: 12px; font-family: 'Share Tech Mono'; margin-bottom: 5px; color: var(--text-dim);">POSISI AKTIF</div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; align-items: center;">
+                    <span id="pos-info">Tidak ada posisi terbuka</span>
+                    <span id="pos-pl" style="font-family: 'Share Tech Mono';">$0.00</span>
+                </div>
+                <button id="btn-close" class="btn-action btn-sell" style="margin-top: 8px; display:none; padding: 6px; font-size: 12px;" onclick="closePosition()">TUTUP POSISI</button>
             </div>
         </div>
 
-        <!-- TAB 2: CRYPTO MINING -->
+        <!-- TAB 2: MINING -->
         <div id="tab-mining" class="tab-content" style="display: none;">
-            <div class="card" style="text-align: center;">
-                <h2>Rig Penambang Kripto</h2>
-                <p>Perangkat Saat Ini: <strong id="rig-name" style="color: #38bdf8;">HP Kentang (Single Core)</strong></p>
-                <p>Kecepatan Mining: <strong id="rig-speed" style="color: #22c55e;">0.001 BTC / menit</strong></p>
-                <hr style="border-color: #475569; margin: 15px 0;">
-                <p style="font-size: 12px; color: #94a3b8;">Saldo Kripto Ditambang:</p>
-                <h3 id="mining-balance" style="color: #fbbf24;">0.000000 BTC</h3>
-                <button class="btn-upgrade" onclick="cairkanCrypto()">Cairkan Kripto ke Saldo USD ($)</button>
+            <div class="section-box" style="text-align: center; padding: 20px;">
+                <div style="color: var(--text-dim); font-size: 12px; font-family: 'Share Tech Mono';">STATUS RIG MINING</div>
+                <h3 id="rig-name" style="color: var(--accent-cyan); margin: 5px 0;">HP Kentang (Single Core)</h3>
+                <p style="font-size: 12px; color: var(--text-dim);">Kecepatan Hash: <span style="color: var(--accent-green);" id="rig-speed">0.0001 BTC/dtk</span></p>
+                
+                <div style="margin: 20px 0;">
+                    <div style="font-size: 11px; color: var(--text-dim);">SALDO MINED:</div>
+                    <h2 id="mining-balance" style="color: #fbbf24; font-family: 'Share Tech Mono'; margin: 5px 0;">0.000000 BTC</h2>
+                </div>
+                <button class="btn-tech" style="width: 100%; padding: 10px; background: rgba(245, 158, 11, 0.1);" onclick="cairkanCrypto()">CAIRKAN KE USD WALLET</button>
             </div>
         </div>
 
-        <!-- TAB 3: UPGRADE SETUP PC & HARDWARE -->
+        <!-- TAB 3: UPGRADE HARDWARE -->
         <div id="tab-upgrade" class="tab-content" style="display: none;">
-            <div class="card">
-                <h2>Toko Hardware & Setup Trader</h2>
-                <p style="font-size: 12px; color: #94a3b8;">Upgrade spek PC untuk mempercepat mining crypto dan kelancaran trading!</p>
-                <div style="background: #1e293b; padding: 10px; border-radius: 6px; margin-bottom: 8px;">
-                    <strong>1. VGA Mining Rig (RTX 3060)</strong><br>
-                    <span style="font-size: 11px; color: #94a3b8;">Tambah kecepatan mining 5x lipat.</span><br>
-                    <button onclick="beliUpgrade('vga', 500)">Beli ($500)</button>
+            <div class="section-box">
+                <div style="font-size: 12px; font-family: 'Share Tech Mono'; margin-bottom: 10px; color: var(--text-dim);">HARDWARE WORKSTATION & RIG</div>
+                
+                <div class="upgrade-item">
+                    <div><strong>VGA Mining Rig (RTX 3060)</strong><br><span style="font-size: 10px; color: var(--text-dim);">Boost kecepatan crypto mining 5x</span></div>
+                    <button class="btn-tech" onclick="beliUpgrade('vga', 400)">$400</button>
                 </div>
-                <div style="background: #1e293b; padding: 10px; border-radius: 6px;">
-                    <strong>2. PC Setup Multi-Monitor Pro</strong><br>
-                    <span style="font-size: 11px; color: #94a3b8;">Meningkatkan akurasi analisis market trading.</span><br>
-                    <button onclick="beliUpgrade('pc', 1200)">Beli ($1,200)</button>
+                <div class="upgrade-item">
+                    <div><strong>Quantum Terminal Display</strong><br><span style="font-size: 10px; color: var(--text-dim);">Akurasi analisis market forex + stabil</span></div>
+                    <button class="btn-tech" onclick="beliUpgrade('terminal', 900)">$900</button>
                 </div>
             </div>
         </div>
 
-        <!-- LOG AKTIVITAS -->
-        <div class="card">
-            <h2>Log Sistem</h2>
-            <div class="log-box" id="system-log">Sistem siap. Selamat datang di dunia Trader & Miner Tycoon!</div>
+        <!-- TERMINAL LOG -->
+        <div class="section-box" style="margin-bottom: 0;">
+            <div style="font-size: 10px; font-family: 'Share Tech Mono'; color: var(--text-dim); margin-bottom: 4px;">SYSTEM_LOGS //</div>
+            <div class="terminal-log" id="system-log">> Sistem inisialisasi berhasil... Siap beroperasi.<br></div>
         </div>
     </div>
 
     <script>
-        let game = {
-            usd: 1000.00,
-            crypto: 0.0000,
-            goldPrice: 2650.00,
-            position: null,
-            miningSpeed: 0.0001,
-            rigLevel: 1
+        // Data Pair Forex & Crypto Lengkap
+        const pairs = {
+            "XAU/USD": { price: 2650.00, decimals: 2, vol: 3.5 },
+            "EUR/USD": { price: 1.0850, decimals: 4, vol: 0.0015 },
+            "GBP/USD": { price: 1.3020, decimals: 4, vol: 0.0018 },
+            "USD/JPY": { price: 152.50, decimals: 2, vol: 0.15 },
+            "BTC/USD": { price: 87500.0, decimals: 1, vol: 120.0 },
+            "ETH/USD": { price: 3250.00, decimals: 2, vol: 15.0 }
         };
 
-        // Simulasi Pergerakan Harga Emas (XAU/USD) Real-time
-        setInterval(() => {
-            let change = (Math.random() - 0.48) * 3.5;
-            game.goldPrice += change;
-            game.goldPrice = parseFloat(game.goldPrice.toFixed(2));
-            document.getElementById("chart-price").innerText = "$" + game.goldPrice.toLocaleString('en-US', {minimumFractionDigits: 2});
+        let currentPair = "XAU/USD";
+        let game = {
+            usd: 1500.00,
+            crypto: 0.0000,
+            position: null, // { pair, type, entry, amount }
+            miningSpeed: 0.0001
+        };
 
+        // Riwayat harga untuk chart
+        let priceHistory = [];
+        for(let i=0; i<30; i++) priceHistory.push(pairs[currentPair].price);
+
+        // Inisialisasi Tombol Pair
+        function initPairs() {
+            let list = document.getElementById("pair-list");
+            list.innerHTML = "";
+            Object.keys(pairs).forEach(p => {
+                let btn = document.createElement("button");
+                btn.className = `pair-btn ${p === currentPair ? 'active' : ''}`;
+                btn.innerText = p;
+                btn.onclick = () => switchPair(p);
+                list.appendChild(btn);
+            });
+        }
+
+        function switchPair(p) {
             if(game.position) {
-                let diff = game.goldPrice - game.position.entry;
-                let profit = game.position.type === 'BUY' ? diff * 10 : -diff * 10;
-                let plEl = document.getElementById("val-floating");
+                alert("Selesaikan posisi aktif pada pair saat ini terlebih dahulu!");
+                return;
+            }
+            currentPair = p;
+            priceHistory = [];
+            for(let i=0; i<30; i++) priceHistory.push(pairs[currentPair].price);
+            document.getElementById("active-pair-label").innerText = currentPair;
+            initPairs();
+        }
+
+        // Main Loop Update Harga & Chart (Setiap 1 Detik)
+        setInterval(() => {
+            let data = pairs[currentPair];
+            let shift = (Math.random() - 0.49) * data.vol;
+            data.price += shift;
+            data.price = parseFloat(data.price.toFixed(data.decimals));
+
+            // Update riwayat chart
+            priceHistory.push(data.price);
+            if(priceHistory.length > 30) priceHistory.shift();
+
+            // Render Harga & Chart
+            document.getElementById("active-price").innerText = (currentPair.includes("USD") && !currentPair.startsWith("USD") && !currentPair.includes("BTC") && !currentPair.includes("ETH")) ? 
+                "$" + data.price.toLocaleString('en-US', {minimumFractionDigits: data.decimals}) : 
+                (currentPair.includes("/") ? data.price.toFixed(data.decimals) : "$" + data.price.toFixed(data.decimals));
+
+            drawChart();
+
+            // Hitung Floating P/L
+            if(game.position) {
+                let diff = data.price - game.position.entry;
+                let rawPl = game.position.type === 'BUY' ? diff : -diff;
+                let profit = rawPl * (currentPair.includes("JPY") ? 100 : (currentPair.includes("BTC") ? 0.1 : 50));
+                
+                let plEl = document.getElementById("pos-pl");
                 plEl.innerText = (profit >= 0 ? "+$" : "-$") + Math.abs(profit).toFixed(2);
-                plEl.style.color = profit >= 0 ? "#22c55e" : "#ef4444";
+                plEl.style.color = profit >= 0 ? "var(--accent-green)" : "var(--accent-red)";
             }
         }, 1000);
 
-        // Simulasi Crypto Mining Berjalan Otomatis
+        // Background Crypto Mining Loop
         setInterval(() => {
             game.crypto += game.miningSpeed;
-            document.getElementById("val-crypto").innerText = game.crypto.toFixed(4) + " BTC";
+            document.getElementById("val-crypto").innerText = game.crypto.toFixed(4);
             document.getElementById("mining-balance").innerText = game.crypto.toFixed(6) + " BTC";
         }, 1000);
 
+        // Fungsi Menggambar Chart Canvas bergaya Terminal
+        function drawChart() {
+            let canvas = document.getElementById("priceChart");
+            let ctx = canvas.getContext("2d");
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            let min = Math.min(...priceHistory);
+            let max = Math.max(...priceHistory);
+            let range = max - min === 0 ? 1 : max - min;
+            let stepX = canvas.width / (priceHistory.length - 1);
+
+            // Gambar Garis Chart
+            ctx.beginPath();
+            ctx.strokeStyle = "var(--accent-cyan)";
+            ctx.lineWidth = 2;
+
+            priceHistory.forEach((val, i) => {
+                let x = i * stepX;
+                let y = canvas.height - ((val - min) / range) * (canvas.height - 20) - 10;
+                if(i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+        }
+
         function switchTab(tabName, btn) {
             document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-            document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
             document.getElementById('tab-' + tabName).style.display = 'block';
             btn.classList.add('active');
         }
 
         function openPosition(type) {
             if(game.position) {
-                alert("Tutup posisi yang sedang aktif terlebih dahulu!");
+                alert("Tutup posisi aktif terlebih dahulu!");
                 return;
             }
-            game.position = { type: type, entry: game.goldPrice };
-            document.getElementById("pos-status").innerText = `${type} di harga $${game.goldPrice}`;
+            let price = pairs[currentPair].price;
+            game.position = { pair: currentPair, type: type, entry: price };
+            
+            document.getElementById("pos-info").innerText = `${type} [${currentPair}] @ ${price}`;
             document.getElementById("btn-close").style.display = "block";
-            log(`Membuka posisi ${type} di harga $${game.goldPrice}`);
+            log(`ORDER EXECUTED: ${type} ${currentPair} pada harga ${price}`);
         }
 
         function closePosition() {
-            let diff = game.goldPrice - game.position.entry;
-            let profit = game.position.type === 'BUY' ? diff * 10 : -diff * 10;
+            let price = pairs[game.position.pair].price;
+            let diff = price - game.position.entry;
+            let rawPl = game.position.type === 'BUY' ? diff : -diff;
+            let profit = rawPl * (game.position.pair.includes("JPY") ? 100 : (game.position.pair.includes("BTC") ? 0.1 : 50));
+
             game.usd += profit;
-            
-            log(`Menutup posisi. Profit/Loss: ${profit >= 0 ? '+' : ''}$${profit.toFixed(2)}`);
-            
-            game.position = null;
-            document.getElementById("pos-status").innerText = "Tidak ada posisi aktif";
-            document.getElementById("val-floating").innerText = "$0.00";
-            document.getElementById("btn-close").style.display = "none";
             updateUI();
+
+            log(`POSITION CLOSED. P/L: ${profit >= 0 ? '+' : ''}$${profit.toFixed(2)}`);
+            game.position = null;
+            document.getElementById("pos-info").innerText = "Tidak ada posisi terbuka";
+            document.getElementById("pos-pl").innerText = "$0.00";
+            document.getElementById("btn-close").style.display = "none";
         }
 
         function cairkanCrypto() {
-            if(game.crypto <= 0.0001) {
-                alert("Saldo kripto masih terlalu sedikit untuk dicairkan!");
+            if(game.crypto < 0.0001) {
+                alert("Saldo kripto terlalu sedikit!");
                 return;
             }
-            let usdEarned = game.crypto * 85000;
-            game.usd += usdEarned;
+            let earned = game.crypto * 85000;
+            game.usd += earned;
             game.crypto = 0;
             updateUI();
-            log(`Berhasil mencairkan kripto senilai $${usdEarned.toFixed(2)} ke kas USD!`);
+            log(`MINING PAYOUT: Ditukar ke USD senilai +$${earned.toFixed(2)}`);
         }
 
         function beliUpgrade(type, cost) {
@@ -255,17 +459,17 @@
                 game.usd -= cost;
                 if(type === 'vga') {
                     game.miningSpeed *= 5;
-                    document.getElementById("rig-name").innerText = "PC Gaming / Rig GPU RTX 3060";
-                    document.getElementById("rig-speed").innerText = "0.0005 BTC / detik";
-                    alert("Berhasil membeli VGA Mining Rig! Kecepatan penambangan kripto meningkat pesat.");
-                } else if(type === 'pc') {
-                    game.miningSpeed *= 3;
-                    document.getElementById("rig-name").innerText = "Professional Trading & Mining Station";
-                    alert("Berhasil upgrade PC Setup! Analisis market lebih stabil dan mining makin ngebut.");
+                    document.getElementById("rig-name").innerText = "Rig GPU RTX 3060 [TURBO]";
+                    document.getElementById("rig-speed").innerText = "0.0005 BTC/dtk";
+                    alert("Upgrade VGA berhasil! Hashrate mining melesat.");
+                } else if(type === 'terminal') {
+                    game.miningSpeed *= 2;
+                    alert("Quantum Terminal terpasang! Stabilitas market meningkat.");
                 }
                 updateUI();
+                log(`HARDWARE UPGRADE INSTALLED: ${type}`);
             } else {
-                alert("Saldo USD tidak cukup!");
+                alert("USD Wallet tidak mencukupi!");
             }
         }
 
@@ -278,6 +482,9 @@
             box.innerHTML += `> ${text}<br>`;
             box.scrollTop = box.scrollHeight;
         }
+
+        // Run Init
+        initPairs();
     </script>
 
 </body>
